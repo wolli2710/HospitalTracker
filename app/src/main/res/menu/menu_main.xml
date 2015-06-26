@@ -1,0 +1,39 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+
+
+    <item android:id="@+id/userIdMenu"
+        android:title="UserId:"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/userSexMenu"
+        android:title="Geschlecht:"
+        android:orderInCategory="3"
+        app:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/userAgeMenu"
+        android:title="Alter:"
+        android:orderInCategory="5"
+        app:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/buttonCalibrate"
+        android:title="Calibrate"
+        android:orderInCategory="8"
+        app:showAsAction="ifRoom|withText"
+        />
+
+    <item android:id="@+id/buttonEmpty"
+        android:title=""
+        android:orderInCategory="9"
+        app:showAsAction="ifRoom|withText"
+        />
+
+    <item android:id="@+id/buttonEnd"
+        android:title="Beenden"
+        android:orderInCategory="10"
+        app:showAsAction="ifRoom|withText"
+        />
+
+</menu>

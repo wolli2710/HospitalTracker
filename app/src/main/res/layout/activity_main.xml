@@ -1,0 +1,236 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+    android:background="#555555">
+
+
+    <GridLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <GridLayout
+            android:background="@drawable/custom_shape"
+            android:layout_row="0"
+            android:layout_column="0"
+            >
+
+            <ToggleButton
+                android:background="#ff00ff00"
+                android:layout_width="260dp"
+                android:layout_height="90dp"
+                android:textOn="Besuch Stop"
+                android:textOff="Besuch Start"
+                android:textSize="30dp"
+                android:textAlignment="center"
+                android:textColor="@color/primary_text_default_material_light"
+                android:id="@+id/toggleButtonVisit"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:layout_marginTop="20dp"
+                />
+
+            <ToggleButton
+                android:background="#ff00ff00"
+                android:layout_width="260dp"
+                android:layout_height="90dp"
+                android:textOn="Ausser Haus Stop"
+                android:textOff="Ausser Haus Start"
+                android:textSize="30dp"
+                android:textAlignment="center"
+                android:textColor="@color/primary_text_default_material_light"
+                android:id="@+id/toggleButtonOutOfHouse"
+                android:layout_row="1"
+                android:layout_column="0"
+                android:layout_marginTop="20dp"
+                />
+        </GridLayout>
+
+        <GridLayout
+            android:layout_row="0"
+            android:layout_column="3"
+            >
+
+            <ToggleButton
+                android:background="#ff00ff00"
+                android:layout_width="260dp"
+                android:layout_height="90dp"
+                android:textOn="Pflege Stop"
+                android:textOff="Pflege Start"
+                android:textSize="30dp"
+                android:textAlignment="center"
+                android:textColor="@color/primary_text_default_material_light"
+                android:id="@+id/toggleButtonCare"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:layout_marginTop="20dp"
+                />
+
+            <ToggleButton
+                android:background="#ff00ff00"
+                android:layout_width="260dp"
+                android:layout_height="90dp"
+                android:textOn="Therapie \nStop"
+                android:textOff="Therapie \nStart"
+                android:textSize="30dp"
+                android:textAlignment="center"
+                android:textColor="@color/primary_text_default_material_light"
+                android:id="@+id/toggleButtonTherapy"
+                android:layout_row="1"
+                android:layout_column="0"
+                android:layout_marginTop="20dp"
+                />
+        </GridLayout>
+
+        <ToggleButton
+            android:background="#ff00ff00"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:textOn="Aktigraphie\n Start"
+            android:textOff="Aktigraphie\n Stop"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="@color/primary_text_default_material_light"
+            android:id="@+id/toggleButtonActigraphie"
+            android:layout_row="1"
+            android:layout_column="0"
+            android:layout_marginTop="20dp"
+            />
+
+        <ToggleButton
+            android:background="#ff00ff00"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:textOn="Rollstuhl Stop"
+            android:textOff="Rollstuhl Start"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="@color/primary_text_default_material_light"
+            android:id="@+id/toggleButtonWheelChair"
+            android:layout_row="1"
+            android:layout_column="3"
+            />
+
+
+        <Button
+            android:background="#ff0000ff"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:text="Medikamente"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:id="@+id/buttonMedicine"
+            android:layout_row="2"
+            android:layout_column="0"
+            android:layout_marginTop="20dp"
+            />
+
+        <Button
+            android:background="#ff0000ff"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:text="Nahrung"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:id="@+id/buttonFood"
+            android:layout_row="2"
+            android:layout_column="3"
+            android:layout_marginTop="20dp"
+            />
+
+        <Button
+            android:background="#ff0000ff"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:text="Licht An"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:id="@+id/buttonLightOn"
+            android:layout_row="3"
+            android:layout_column="0"
+            android:layout_marginTop="20dp"
+            />
+
+        <Button
+            android:background="#ff0000ff"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:text="Licht Aus"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:id="@+id/buttonLightOff"
+            android:layout_row="3"
+            android:layout_column="3"
+            android:layout_marginTop="20dp"
+            />
+
+
+        <Button
+            android:background="#ff0000ff"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:text="Augen Geschlossen"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:id="@+id/buttonEyesClosed"
+            android:layout_row="4"
+            android:layout_column="0"
+            android:layout_marginTop="20dp"
+            />
+
+        <Button
+            android:background="#ff0000ff"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:text="Augen \nOffen"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:id="@+id/buttonEyesOpen"
+            android:layout_row="4"
+            android:layout_column="3"
+            android:layout_marginTop="20dp"
+            />
+
+        <ToggleButton
+            android:background="#FFD700"
+            android:layout_width="260dp"
+            android:layout_height="90dp"
+            android:textOn="Lichtbrille Stop"
+            android:textOff="Lichtbrille Start"
+            android:textSize="30dp"
+            android:textAlignment="center"
+            android:textColor="@color/primary_text_default_material_light"
+            android:id="@+id/toggleButtonLightGlasses"
+            android:layout_row="5"
+            android:layout_column="0"
+            android:layout_marginTop="20dp"
+            />
+
+        <Button
+            android:background="#ffcccccc"
+            android:layout_width="260dp"
+            android:layout_height="50dp"
+            android:text="Menü"
+            android:textSize="20dp"
+            android:textAlignment="center"
+            android:textColor="@color/primary_text_default_material_light"
+            android:id="@+id/buttonMenu"
+            android:layout_row="5"
+            android:layout_column="3"
+            android:layout_marginTop="60dp"
+            />
+
+    </GridLayout>
+
+</RelativeLayout>
