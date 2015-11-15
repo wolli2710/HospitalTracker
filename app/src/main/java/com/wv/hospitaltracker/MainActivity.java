@@ -1,12 +1,11 @@
 package com.wv.hospitaltracker;
 
-//import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.media.MediaMuxer;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -14,94 +13,85 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-
 public class MainActivity extends Activity {
+    MediaRecorder mRecorder = null;
 
-    ToggleButton careButton;
-    ToggleButton visitButton;
-    ToggleButton therapyButton;
-    ToggleButton wheelchairButton;
-    ToggleButton actigraphieButton;
-    ToggleButton outOfHouse;
+    ToggleButton rhymeButton;
+    Runnable rhymeButtonRunnable;
+    Handler rhymeButtonHandler;
+    boolean childAwakeAsleep = true;
+    boolean isRecording = true;
 
-    ToggleButton lightGlassesButton;
-    Runnable lightGlassButtonRunnable;
-    Handler lightGlassButtonHandler;
+    public static  TextView audioTextView;
 
-    Button medicineButton;
-    Button foodButton;
-    Button lightOnButton;
-    Button lightOffButton;
-    Button eyesOpenButton;
-    Button eyesClosedButton;
+    Button errorButton;
+
     Button menuButton;
+
+    Button childAwake;
+    Button childAsleep;
 
     HashMap csvEntries = new HashMap<String, Long >();
     CSVHandler csv;
-    AudioHandler audioHandler;
 
     @Override
     protected void onPause() {
         super.onPause();
-        audioHandler.stopRecording();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        audioHandler = AudioHandler.getAudioActivity();
-        audioHandler.startRecording();
     }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        careButton = (ToggleButton)findViewById(R.id.toggleButtonCare);
-        wheelchairButton = (ToggleButton)findViewById(R.id.toggleButtonWheelChair);
-        visitButton = (ToggleButton)findViewById(R.id.toggleButtonVisit);
-        therapyButton = (ToggleButton)findViewById(R.id.toggleButtonTherapy);
-        actigraphieButton = (ToggleButton)findViewById(R.id.toggleButtonActigraphie);
-        outOfHouse = (ToggleButton)findViewById(R.id.toggleButtonOutOfHouse);
+        rhymeButton = (ToggleButton)findViewById(R.id.toggleButtonRhyme);
 
-        lightGlassesButton = (ToggleButton)findViewById(R.id.toggleButtonLightGlasses);
-
-        medicineButton = (Button)findViewById(R.id.buttonMedicine);
-        foodButton = (Button)findViewById(R.id.buttonFood);
-        lightOnButton = (Button)findViewById(R.id.buttonLightOn);
-        lightOffButton = (Button)findViewById(R.id.buttonLightOff);
-        eyesClosedButton = (Button)findViewById(R.id.buttonEyesClosed);
-        eyesOpenButton = (Button)findViewById(R.id.buttonEyesOpen);
+        errorButton = (Button)findViewById(R.id.error);
         menuButton = (Button)findViewById(R.id.buttonMenu);
+        childAwake = (Button)findViewById(R.id.childAwake);
+        childAsleep = (Button)findViewById(R.id.childAsleap);
 
         csv = new CSVHandler( "/storage/sdcard0/Android/data/com.hospitalTracker.wv" );
-        audioHandler = AudioHandler.getAudioActivity();
-        audioHandler.startRecording();
+
+        audioTextView = (TextView)findViewById(R.id.textViewAudioSignal);
+
+        mRecorder = new MediaRecorder();
+        try{
+            mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mRecorder.setOutputFile("/dev/null");
+
+            mRecorder.prepare();
+            mRecorder.start();
+        } catch (IOException e){
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
 
         toggleButtonHandler();
         buttonHandler();
+        createAudioThread();
     }
 
     private void buttonHandler(){
-        menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showMenu(v);
-            }
-        });
-        eyesOpenButton.setOnTouchListener(new View.OnTouchListener() {
+        errorButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent e) {
                 buttonTouchBehaviourHandler(v, e);
@@ -109,90 +99,48 @@ public class MainActivity extends Activity {
             }
         });
 
-        eyesClosedButton.setOnTouchListener(new View.OnTouchListener() {
+        childAwake.setOnClickListener(new View.OnClickListener(){
             @Override
-            public boolean onTouch(View v, MotionEvent e) {
-                buttonTouchBehaviourHandler(v,e);
-                return false;
-            }
-        });
-        medicineButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent e) {
-                buttonTouchBehaviourHandler(v,e);
-                return false;
+            public void onClick(View v){
+                setAwakeAsleepButtonColors(v, childAsleep);
             }
         });
 
-        foodButton.setOnTouchListener(new View.OnTouchListener() {
+        childAsleep.setOnClickListener(new View.OnClickListener(){
             @Override
-            public boolean onTouch(View v, MotionEvent e) {
-                buttonTouchBehaviourHandler(v,e);
-                return false;
+            public void onClick(View v){
+                setAwakeAsleepButtonColors(v, childAwake);
             }
         });
 
-        lightOnButton.setOnTouchListener(new View.OnTouchListener() {
+        menuButton.setOnTouchListener(new View.OnTouchListener(){
             @Override
-            public boolean onTouch(View v, MotionEvent e) {
-                buttonTouchBehaviourHandler(v,e);
-                return false;
-            }
-        });
-
-        lightOffButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent e) {
-                buttonTouchBehaviourHandler(v,e);
+            public boolean onTouch(View v, MotionEvent e){
+                System.exit(0);
                 return false;
             }
         });
     }
 
+    private void setAwakeAsleepButtonColors(View v, Button b){
+        if(childAwakeAsleep) {
+            v.setBackgroundColor(0xFF0000FF);
+            b.setBackgroundColor(0xFFFFFFFF);
+            buttonBehaviourHandler(v);
+            childAwakeAsleep = false;
+        }
+    }
+
     private void toggleButtonHandler(){
-        outOfHouse.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                toggleButtonBehaviourHandler(v);
-            }
-        });
-        actigraphieButton.setOnClickListener(new View.OnClickListener() {
+        rhymeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             toggleButtonBehaviourHandler(v);
             boolean on = ((ToggleButton) v).isChecked();
-            if(on) {
-                startBlinkingBehaviour(20, v);
-            }else{
-                stopBlinkingBehaviour();
-            }
-            }
-        });
-        wheelchairButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                toggleButtonBehaviourHandler(v);
-            }
-        });
-        careButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                toggleButtonBehaviourHandler(v);
-            }
-        });
-        visitButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-            toggleButtonBehaviourHandler(v);
-            }
-        });
-        therapyButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-            toggleButtonBehaviourHandler(v);
-            }
-        });
-        lightGlassesButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-            toggleButtonBehaviourHandler(v);
-            boolean on = ((ToggleButton) v).isChecked();
-            if(on) {
-                startBlinkingBehaviour(60, v);
-            }else{
+            if (on) {
+                ((GridLayout)findViewById(R.id.gridLayoutButtons)).setVisibility(View.VISIBLE);
+                startBlinkingBehaviour(5, v);
+            } else {
+                ((GridLayout)findViewById(R.id.gridLayoutButtons)).setVisibility(View.GONE);
                 stopBlinkingBehaviour();
             }
             }
@@ -202,20 +150,20 @@ public class MainActivity extends Activity {
     private void startBlinkingBehaviour(int t, View v){
         final int t1 = t;
         final View v1 = v;
-        lightGlassButtonHandler = new Handler();
-        lightGlassButtonHandler.postDelayed(
-            lightGlassButtonRunnable = new Runnable() {
-                @Override
-                public void run() {
-                int delay = 300;
-                changeColourOverTime(delay, v1, 0xFF00FF00, 0xFFFFFF00);
-                }
-            }, getMinutes(t1)
+        rhymeButtonHandler = new Handler();
+        rhymeButtonHandler.postDelayed(
+                rhymeButtonRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        int delay = 300;
+                        changeColourOverTime(delay, v1, 0xFF00FF00, 0xFFFFFF00);
+                    }
+                }, getMinutes(t1)
         );
     }
 
     private void stopBlinkingBehaviour(){
-        lightGlassButtonHandler.removeCallbacks(lightGlassButtonRunnable);
+        rhymeButtonHandler.removeCallbacks(rhymeButtonRunnable);
     }
 
     private void changeColourOverTime(int t, View v, int cPrev, int cNew){
@@ -223,20 +171,20 @@ public class MainActivity extends Activity {
         final View v1 = v;
         final int c1 = cNew;
         final int c2 = cPrev;
-        lightGlassButtonHandler = new Handler();
-        lightGlassButtonHandler.postDelayed(
-            lightGlassButtonRunnable = new Runnable() {
+        rhymeButtonHandler = new Handler();
+        rhymeButtonHandler.postDelayed(
+            rhymeButtonRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    v1.setBackgroundColor(c1);
-                    changeColourOverTime(t1, v1, c1, c2);
+                v1.setBackgroundColor(c1);
+                changeColourOverTime(t1, v1, c1, c2);
                 }
             }, t
         );
     }
 
-    private void buttonBehaviourHandler(View v){
-        String name = getResources().getResourceEntryName(v.getId()).replace("button", "");
+    public void buttonBehaviourHandler(View v){
+        String name = getResources().getResourceEntryName(v.getId());
         Long ts = System.currentTimeMillis()/1000;
         String timeStamp = ts.toString();
 
@@ -246,10 +194,10 @@ public class MainActivity extends Activity {
 
     public void buttonTouchBehaviourHandler(View v, MotionEvent e){
         if(e.getAction() == MotionEvent.ACTION_UP) {
-            v.setBackgroundColor(0xFF0000FF);
+            v.setBackgroundColor(Color.parseColor("#FF0000"));
         } else if(e.getAction() == MotionEvent.ACTION_DOWN) {
             buttonBehaviourHandler(v);
-            v.setBackgroundColor(0xFF00FF00);
+            v.setBackgroundColor(Color.parseColor("#FFFFFF"));
         }
     }
 
@@ -286,20 +234,7 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public boolean onKeyDown(int keycode, KeyEvent e){
@@ -315,43 +250,56 @@ public class MainActivity extends Activity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void showMenu(View view){
-
-        PopupMenu popupMenu = new PopupMenu(this, view);
-        popupMenu.inflate(R.menu.menu_main);
-
-        popupMenu.getMenu().add(0, 0, 2, Data.userId );
-        popupMenu.getMenu().add(0, 0, 4, Data.userSex);
-        popupMenu.getMenu().add(0, 0, 6, Data.userAge);
-        popupMenu.getMenu().add(0, 0, 7, "");
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-            if (item.getTitle().equals("Calibrate")) {
-                Toast.makeText(MainActivity.this, "You calibrated the File successfully...", Toast.LENGTH_SHORT).show();
-
-                Long ts = System.currentTimeMillis() / 1000;
-                String timeStamp = ts.toString();
-
-                String dateTime = getDateTimeFromTimeStamp(new Date(ts));
-                csv.writeToFile("calibrate", timeStamp, dateTime);
-            }
-            if (item.getTitle().equals("Beenden")){
-                //stop audio
-                audioHandler.stopRecording();
-                //stop app
-                System.exit(0);
-            }
-            return true;
-            }
-        });
-        popupMenu.show();
-    }
-
     private String getDateTimeFromTimeStamp(Date date){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy' 'HH:mm:ss");
         return simpleDateFormat.format(date);
     }
 
+    private int getAmplitude() {
+        if (mRecorder != null){
+            return  mRecorder.getMaxAmplitude();
+        }else{
+            Log.d("AudioActivity", "no MediaRecorder found!!");
+            return 0;
+        }
+    }
+
+    private void createAudioThread() {
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                while(isRecording){
+                    try {
+                        Thread.sleep(1000);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            int cAmplitude = getAmplitude();
+                            if(cAmplitude != 0) {
+                                String currentAmplitude = new Integer(cAmplitude).toString();
+                                audioTextView.setText(currentAmplitude);
+                                setAudioBackgroundColor(cAmplitude);
+                            }
+                        }
+                    });
+                }
+            }
+        };
+
+        new Thread(runnable).start();
+    }
+
+    private void setAudioBackgroundColor(int amplitude){
+        if(amplitude < 500) {
+            audioTextView.setBackgroundColor(Color.parseColor("#99FF00"));
+        } else if(amplitude > 3000) {
+            audioTextView.setBackgroundColor(Color.parseColor("#FF0000"));
+        } else{
+            audioTextView.setBackgroundColor(Color.parseColor("#FFCC00"));
+        }
+    }
 }

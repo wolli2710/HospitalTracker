@@ -2,6 +2,7 @@ package com.wv.hospitaltracker;
 
 import android.media.MediaRecorder;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,6 +14,7 @@ import java.io.IOException;
 public class AudioHandler extends FileWriteHandler{
 
     public static AudioHandler instance = null;
+    public static int audioText = 0;
     private MediaRecorder mRecorder = null;
 
     private static Thread audioThread;
@@ -66,6 +68,9 @@ public class AudioHandler extends FileWriteHandler{
                 try {
                     while(isRecording){
                         int currentAmplitude = getAmplitude();
+//                        AudioHandler.audioText = currentAmplitude;
+                        Log.d("amplitude", currentAmplitude+"");
+                        MainActivity.audioTextView.setText(currentAmplitude+"");
 //                        if(currentAmplitude > 400){
 
 //                        Log.i("currentAmplitude", String.valueOf(currentAmplitude) );

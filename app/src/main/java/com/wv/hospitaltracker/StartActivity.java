@@ -21,8 +21,6 @@ import java.util.Set;
 
 public class StartActivity extends ActionBarActivity {
 
-    RadioGroup genderButtons;
-    RadioButton maleButton;
     Button startButton;
 
     @Override
@@ -30,13 +28,8 @@ public class StartActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         createButtonHandler();
-        createRadioButtonHandler();
     }
 
-    private void createRadioButtonHandler() {
-        maleButton = (RadioButton)findViewById(R.id.radioButtonMale);
-        genderButtons.check(maleButton.getId());
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -61,20 +54,15 @@ public class StartActivity extends ActionBarActivity {
 
     public void createButtonHandler(){
         startButton = (Button)findViewById(R.id.buttonStart);
-        genderButtons = (RadioGroup)findViewById(R.id.radioButtonsSex);
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText userId = (EditText)findViewById(R.id.editTextId);
-//                EditText userSex = (EditText)findViewById(R.id.editTextSex);
                 EditText userAge = (EditText)findViewById(R.id.editTextAge);
 
-                RadioButton currentButton = (RadioButton)findViewById(genderButtons.getCheckedRadioButtonId());
 
                 Data.userId = userId.getText().toString();
-//                Data.userSex = userSex.getText().toString();
-                Data.userSex = currentButton.getText().toString();
                 Data.userAge = userAge.getText().toString();
 
                 if(valid()) {
@@ -88,7 +76,7 @@ public class StartActivity extends ActionBarActivity {
     }
 
     private boolean valid(){
-        if(Data.userId.length() != 0 && Data.userSex.length() != 0 && Data.userAge.length() != 0){
+        if(Data.userId.length() != 0 && Data.userAge.length() != 0){
             if(isNumerical(Data.userAge) ){
                 return true;
             }
@@ -99,9 +87,4 @@ public class StartActivity extends ActionBarActivity {
     private boolean isNumerical(String num){
         return num.matches("[0-9]+");
     }
-
-    private boolean isString(String str){
-        return str.matches("[a-zA-Z]+");
-    }
-
 }
